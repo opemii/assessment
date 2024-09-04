@@ -110,17 +110,16 @@ resource "google_iam_workload_identity_pool_provider" "github-provider" {
   project                            = var.project_id
   workload_identity_pool_id          = google_iam_workload_identity_pool.github-pool.workload_identity_pool_id
   workload_identity_pool_provider_id = "github-provider"
+  attribute_condition = "assertion.repository == 'opemii/assessment'"
   attribute_mapping                  = {
     "google.subject" = "assertion.sub"
     "attribute.actor"= "assertion.actor"
     "attribute.repository"= "assertion.repository"
-    "attribute.repository_owner"= "assertion.repository_owner"
     "attribute.workflow_ref" = "assertion.job_workflow_ref"
     "attribute.event_name"= "assertion.event_name"
-    "attribute.full" = "assertion.repository+assertion.ref"
   }
   oidc {
-    allowed_audiences = ["google-wlif"]
+    # allowed_audiences = ["google-wlif"]
     issuer_uri        = "https://token.actions.githubusercontent.com"
   }
 }
