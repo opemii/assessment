@@ -25,6 +25,14 @@ resource "google_service_account" "tf_plan" {
   project       = var.project_id
 }
 
+resource "google_storage_bucket_iam_binding" "binding" {
+  bucket = var.state_bucket_name
+  role = "roles/storage.admin"
+  members = [
+    "serviceAccount:${google_service_account.tf_apply.email}"
+  ]
+}
+
 resource "google_service_account" "tf_apply" {
   account_id   = "tf-apply"
   display_name = "Terraform Applier"
@@ -32,17 +40,12 @@ resource "google_service_account" "tf_apply" {
   project       = var.project_id
 }
 
-resource "google_storage_bucket_iam_member" "tf_plan_storage_object_admin" {
-  bucket = var.state_bucket_name
-  role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.tf_plan.email}"
-}
-
 resource "google_storage_bucket_iam_member" "tf_apply_storage_object_admin" {
   bucket = var.state_bucket_name
   role   = "roles/storage.objectAdmin"
   member = "serviceAccount:${google_service_account.tf_apply.email}"
 }
+
 
 # resource "google_project_iam_member" "tf_apply_service_account_admin" {
 #   project = var.project_id
