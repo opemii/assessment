@@ -20,9 +20,7 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 
-        uses: actions/checkout@v2 
-        
+      
       - id: tf_plan_auth
         if: github.ref != 'refs/heads/main'
         name: Authenticate to Google Cloud
@@ -40,7 +38,9 @@ jobs:
           workload_identity_provider: >-
             projects/1091131360319/locations/global/workloadIdentityPools/github-pool/providers/github-provider
           service_account: tf-plan@central-bulwark-434606-u9.gserviceaccount.com
-
+      - name: Checkout 
+        uses: actions/checkout@v2 
+        
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -48,7 +48,7 @@ jobs:
           
       - id: init
         name: Terraform Init
-        working-directory: gcp-infra/**
+        working-directory: gcp-infra
         run: terraform init
 
       - id: fmt
