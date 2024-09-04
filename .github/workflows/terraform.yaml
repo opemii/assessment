@@ -1,0 +1,97 @@
+name: Terraform Workflow
+'on':
+  push:
+    branches:
+      - main
+    paths:
+      - gcp-infra/**
+      - .github/workflows/terraform.yaml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - gcp-infra/**
+      - .github/workflows/terraform.yaml
+jobs:
+  terraform:
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+
+      - id: tf_plan_auth
+        if: github.ref != 'refs/heads/main'
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2.0.0
+        with:
+          workload_identity_provider: >-
+            projects/1091131360319/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: tf-plan@central-bulwark-434606-u9.gserviceaccount.com
+
+      - id: tf_apply_auth
+        if: github.ref == 'refs/heads/main'
+        name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2.0.0
+        with:
+          workload_identity_provider: >-
+            projects/1091131360319/locations/global/workloadIdentityPools/github-pool/providers/github-provider
+          service_account: tf-plan@central-bulwark-434606-u9.gserviceaccount.com
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.4.0
+
+      - id: fmt
+        name: Terraform fmt
+        working-directory: gcp-infra
+        run: terraform fmt -check
+
+      - id: init
+        name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - id: validate
+        name: Terraform Validate
+        run: terraform validate -no-color
+
+      - id: plan
+        name: Terraform Plan
+        working-directory: gcp-infra
+        run: terraform plan -no-color
+        continue-on-error: true
+
+      - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: |-
+            terraform
+            ${{ steps.plan.outputs.stdout }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `
+            #### Terraform Format and Style \`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization \`${{ steps.init.outcome }}\`
+            #### Terraform Validation \`${{ steps.validate.outcome }}\`
+            #### Terraform Plan \`${{ steps.plan.outcome }}\`
+            
+            <details><summary>Show Plan</summary>
+            
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+            
+            </details>
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        working-directory: gcp-infra
+        run: terraform apply -auto-approve -input=false
