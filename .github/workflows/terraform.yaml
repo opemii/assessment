@@ -39,7 +39,9 @@ jobs:
             projects/1091131360319/locations/global/workloadIdentityPools/github-pool/providers/github-provider
           service_account: tf-plan@central-bulwark-434606-u9.gserviceaccount.com
       - name: Checkout 
-        uses: actions/checkout@v2 
+        uses: actions/checkout@v2
+        with:
+          path: main
         
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
