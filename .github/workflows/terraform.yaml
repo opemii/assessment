@@ -20,7 +20,9 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     steps:
-
+      - name: Checkout 
+        uses: actions/checkout@v2 
+        
       - id: tf_plan_auth
         if: github.ref != 'refs/heads/main'
         name: Authenticate to Google Cloud
