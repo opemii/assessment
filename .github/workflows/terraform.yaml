@@ -53,7 +53,7 @@ jobs:
           
       - id: init
         name: Terraform Init
-        run: terraform init 
+        run: terraform init -reconfigure
         
       - id: fmt
         name: Terraform fmt
