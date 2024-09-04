@@ -46,7 +46,7 @@ jobs:
           
       - id: init
         name: Terraform Init
-        working-directory: gcp-infra/
+        working-directory: gcp-infra/**
         run: terraform init
 
       - id: fmt
