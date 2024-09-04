@@ -53,8 +53,8 @@ jobs:
           
       - id: init
         name: Terraform Init
-        run: terraform init -input=false -backend-config="prefix=terraform/state" -backend-config="assessment-bucket-shortlet"
-
+        run: terraform init 
+        
       - id: fmt
         name: Terraform fmt
         run: terraform fmt -check
