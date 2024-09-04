@@ -43,16 +43,16 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.4.0
+          
+      - id: init
+        name: Terraform Init
+        working-directory: ./gcp-infra
+        run: terraform init
 
       - id: fmt
         name: Terraform fmt
         working-directory: ./gcp-infra
         run: terraform fmt -check
-
-      - id: init
-        name: Terraform Init
-        working-directory: ./gcp-infra
-        run: terraform init
 
       - id: validate
         name: Terraform Validate
