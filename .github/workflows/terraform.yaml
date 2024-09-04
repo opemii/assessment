@@ -46,12 +46,12 @@ jobs:
 
       - id: fmt
         name: Terraform fmt
-        working-directory: gcp-infra
+        working-directory: ./gcp-infra
         run: terraform fmt -check
 
       - id: init
         name: Terraform Init
-        working-directory: terraform
+        working-directory: ./gcp-infra
         run: terraform init
 
       - id: validate
@@ -60,7 +60,7 @@ jobs:
 
       - id: plan
         name: Terraform Plan
-        working-directory: gcp-infra
+        working-directory: ./gcp-infra
         run: terraform plan -no-color
         continue-on-error: true
 
@@ -93,5 +93,5 @@ jobs:
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        working-directory: gcp-infra
+        working-directory: ./gcp-infra
         run: terraform apply -auto-approve -input=false
