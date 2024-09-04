@@ -46,12 +46,12 @@ jobs:
           
       - id: init
         name: Terraform Init
-        working-directory: ./gcp-infra
+        working-directory: ./gcp-infra/**
         run: terraform init
 
       - id: fmt
         name: Terraform fmt
-        working-directory: ./gcp-infra
+        working-directory: ./gcp-infra/
         run: terraform fmt -check
 
       - id: validate
